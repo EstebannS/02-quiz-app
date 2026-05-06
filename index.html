@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DevQuiz — Pon a prueba tu conocimiento</title>
+    <meta name="description"
+        content="Quiz interactivo de desarrollo web con temporizador, puntaje y múltiples categorías." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+
+    <!-- PANTALLA: INICIO -->
+    <div class="screen" id="screen-start">
+        <div class="screen__inner">
+            <div class="start__logo">
+                <span class="logo-bracket">[</span>
+                <span class="logo-text">DEV</span>
+                <span class="logo-accent">QUIZ</span>
+                <span class="logo-bracket">]</span>
+            </div>
+            <p class="start__tagline">Pon a prueba tu conocimiento en desarrollo web.</p>
+
+            <div class="start__config">
+                <div class="config__block">
+                    <label class="config__label" for="category-select">// categoría</label>
+                    <div class="select-wrap">
+                        <select id="category-select" class="config__select">
+                            <option value="all">Todas las categorías</option>
+                            <option value="html">HTML</option>
+                            <option value="css">CSS</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="general">Conceptos generales</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="config__block">
+                    <label class="config__label">// dificultad</label>
+                    <div class="diff-btns">
+                        <button class="diff-btn diff-btn--active" data-diff="all">Todas</button>
+                        <button class="diff-btn" data-diff="easy">Fácil</button>
+                        <button class="diff-btn" data-diff="medium">Media</button>
+                        <button class="diff-btn" data-diff="hard">Difícil</button>
+                    </div>
+                </div>
+
+                <div class="config__block">
+                    <label class="config__label">// preguntas</label>
+                    <div class="qty-btns">
+                        <button class="qty-btn" data-qty="5">5</button>
+                        <button class="qty-btn qty-btn--active" data-qty="10">10</button>
+                        <button class="qty-btn" data-qty="15">15</button>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-start" id="btn-start">
+                <span>Iniciar quiz</span>
+                <span class="btn-start__arrow">→</span>
+            </button>
+
+            <div class="start__stats">
+                <div class="stat-chip">
+                    <span class="stat-chip__num" id="stat-total">0</span>
+                    <span class="stat-chip__label">preguntas disponibles</span>
+                </div>
+                <div class="stat-chip">
+                    <span class="stat-chip__num" id="stat-best">—</span>
+                    <span class="stat-chip__label">mejor puntaje</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA: QUIZ -->
+    <div class="screen screen--hidden" id="screen-quiz">
+        <!-- Header -->
+        <header class="quiz-header">
+            <div class="quiz-header__left">
+                <div class="quiz-progress-text">
+                    <span id="q-current">1</span>
+                    <span class="quiz-progress-sep">/</span>
+                    <span id="q-total">10</span>
+                </div>
+                <div class="quiz-category-badge" id="q-category-badge">javascript</div>
+            </div>
+            <div class="quiz-header__center">
+                <div class="quiz-progress-bar">
+                    <div class="quiz-progress-fill" id="progress-fill"></div>
+                </div>
+            </div>
+            <div class="quiz-header__right">
+                <div class="timer-wrap" id="timer-wrap">
+                    <svg class="timer-ring" viewBox="0 0 40 40" aria-hidden="true">
+                        <circle class="timer-ring__bg" cx="20" cy="20" r="17" />
+                        <circle class="timer-ring__fill" id="timer-ring-fill" cx="20" cy="20" r="17" />
+                    </svg>
+                    <span class="timer-num" id="timer-num">15</span>
+                </div>
+                <div class="quiz-score-live">
+                    <span class="quiz-score-live__num" id="score-live">0</span>
+                    <span class="quiz-score-live__label">pts</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Pregunta -->
+        <main class="quiz-main">
+            <div class="question-wrap" id="question-wrap">
+                <div class="question-diff" id="q-difficulty"></div>
+                <h2 class="question-text" id="question-text"></h2>
+                <!-- Bloque de código opcional -->
+                <pre class="question-code" id="question-code" hidden><code id="question-code-text"></code></pre>
+            </div>
+
+            <!-- Opciones -->
+            <div class="options-grid" id="options-grid" role="list"></div>
+
+            <!-- Feedback (correcto/incorrecto) -->
+            <div class="feedback" id="feedback" hidden>
+                <div class="feedback__icon" id="feedback-icon"></div>
+                <div class="feedback__content">
+                    <p class="feedback__verdict" id="feedback-verdict"></p>
+                    <p class="feedback__explanation" id="feedback-explanation"></p>
+                </div>
+                <button class="btn-next" id="btn-next">
+                    <span id="btn-next-label">Siguiente →</span>
+                </button>
+            </div>
+        </main>
+
+        <!-- Streak -->
+        <div class="streak-bar" id="streak-bar" hidden>
+            <span class="streak-bar__fire">🔥</span>
+            <span class="streak-bar__text" id="streak-text">Racha de 3</span>
+            <span class="streak-bar__bonus">+bonus</span>
+        </div>
+    </div>
+
+    <!-- PANTALLA: RESULTADOS -->
+    <div class="screen screen--hidden" id="screen-results">
+        <div class="screen__inner results__inner">
+            <div class="results__top">
+                <div class="results__emoji" id="results-emoji"></div>
+                <h2 class="results__title" id="results-title"></h2>
+                <div class="results__score-wrap">
+                    <span class="results__score" id="results-score">0</span>
+                    <span class="results__score-max" id="results-score-max">/100</span>
+                </div>
+                <div class="results__grade" id="results-grade"></div>
+            </div>
+
+            <div class="results__stats">
+                <div class="results__stat">
+                    <span class="results__stat-num" id="res-correct">0</span>
+                    <span class="results__stat-label">correctas</span>
+                </div>
+                <div class="results__stat">
+                    <span class="results__stat-num" id="res-wrong">0</span>
+                    <span class="results__stat-label">incorrectas</span>
+                </div>
+                <div class="results__stat">
+                    <span class="results__stat-num" id="res-time">0s</span>
+                    <span class="results__stat-label">tiempo total</span>
+                </div>
+                <div class="results__stat">
+                    <span class="results__stat-num" id="res-streak">0</span>
+                    <span class="results__stat-label">mejor racha</span>
+                </div>
+            </div>
+
+            <!-- Repaso de respuestas -->
+            <div class="results__review">
+                <h3 class="results__review-title">// repaso de respuestas</h3>
+                <div id="review-list"></div>
+            </div>
+
+            <div class="results__actions">
+                <button class="btn-primary" id="btn-retry">Intentar de nuevo</button>
+                <button class="btn-ghost" id="btn-home">Cambiar configuración</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast de streak -->
+    <div class="toast" id="streak-toast" hidden></div>
+
+    <script src="js/questions.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>
